@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "06659288C46422A10CFF3D2E03B9DF2B6B6A31B4",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "A6E9FB7760371A708EDED98AB769CEF2FFC0F1F7" : 0,
+    "06659288C46422A10CFF3D2E03B9DF2B6B6A31B4" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "919517A5-BECF-4C12-87D6-EBADF73128EA",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "A6E9FB7760371A708EDED98AB769CEF2FFC0F1F7" : "",
+    "06659288C46422A10CFF3D2E03B9DF2B6B6A31B4" : "PropFinder\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "PropFinder",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "PropFinder.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/nhimkova\/PropFinder.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "06659288C46422A10CFF3D2E03B9DF2B6B6A31B4"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/nhimkova\/Uda_iOS_PitchPerfect.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "A6E9FB7760371A708EDED98AB769CEF2FFC0F1F7"
+    }
+  ]
+}

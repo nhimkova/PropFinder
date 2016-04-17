@@ -9,6 +9,7 @@
 import Foundation
 import CoreData
 import UIKit
+import MapKit
 
 class Property : NSManagedObject {
     
@@ -74,7 +75,7 @@ class Property : NSManagedObject {
         
     }
     
-    init( dictionary: [String : AnyObject], context: NSManagedObjectContext) {
+    init( dictionary: [String : AnyObject?], context: NSManagedObjectContext) {
         
         let entity = NSEntityDescription.entityForName("Property", inManagedObjectContext: context)!
         
@@ -111,6 +112,40 @@ class Property : NSManagedObject {
         
     }
     
+//    lazy var dictionary : [String: AnyObject?] {
+//        get {
+//            let dict : [String: AnyObject?] = [
+//                Keys.AuctionDate : auction_date,
+//                Keys.Keywords : keywords,
+//                Keys.BathroomNumber : bathroom_number,
+//                Keys.BedroomNumber : bedroom_number,
+//                Keys.CarSpaces : car_spaces,
+//                Keys.Commission : commission,
+//                Keys.ConstructionYear : construction_year,
+//                Keys.DatasourceName : datasource_name,
+//                Keys.Floor : floor,
+//                Keys.Guid : guid,
+//                Keys.ImgURL : img_url,
+//                Keys.Latitude : latitude,
+//                Keys.ListerName : lister_name,
+//                Keys.ListerURL : lister_url,
+//                Keys.ListingType : listing_type,
+//                Keys.LocationAccuracy : location_accuracy,
+//                Keys.Longitude : longitude,
+//                Keys.Price : price,
+//                Keys.PriceCurrency : price_currency,
+//                Keys.PriceFormatted : price_formatted,
+//                Keys.PriceType : price_type,
+//                Keys.PropertyType : property_type,
+//                Keys.Summary : summary,
+//                Keys.Title : title,
+//                Keys.UpdatedDays : updated_in_days
+//            ]
+//            return dict
+//        }
+//        
+//    }
+    
     var nestoriaImage: UIImage? {
         
         get {
@@ -129,6 +164,33 @@ class Property : NSManagedObject {
             NestoriaClient.Caches.imageCache.storeImage(newValue, withIdentifier: fileName!)
         }
     }
+    
+    var coordinate: CLLocationCoordinate2D? {
+        get {
+            let lat = CLLocationDegrees(latitude!) //TODO: handle errors here!
+            let long = CLLocationDegrees(longitude!)
+            return CLLocationCoordinate2D(latitude: lat, longitude: long)
+        }
+    }
+    
+    
+    override func prepareForDeletion() {
+        
+        let imageURL = NSURL(string: img_url!)
+        
+        print("delete image from local disk: \((imageURL?.lastPathComponent)!)")
+        
+        let path = NestoriaClient.Caches.imageCache.pathForIdentifier((imageURL?.lastPathComponent)!)
+        
+        do {
+            try NSFileManager.defaultManager().removeItemAtPath(path)
+        }
+        catch let error as NSError {
+            print("Cannot delete file at path \(path) because \(error)")
+        }
+        
+    }
+
     
     
 }

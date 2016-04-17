@@ -54,4 +54,34 @@ extension NestoriaClient {
         
     }
     
+    struct Keys {
+        
+        static let AuctionDate = "auction_date"
+        static let BathroomNumber = "bathroom_number"
+        static let BedroomNumber = "bedroom_number"
+        static let CarSpaces = "car_spaces"
+        static let Commission = "commission"
+        static let ConstructionYear = "construction_year"
+        static let DatasourceName = "datasource_name"
+        static let Floor = "floor"
+        static let Guid = "guid"
+        static let ImgURL = "img_url"
+        static let Keywords = "keywords"
+        static let Latitude = "latitude"
+        static let ListerName = "lister_name"
+        static let ListerURL = "lister_url"
+        static let ListingType = "listing_type"
+        static let LocationAccuracy = "location_accuracy"
+        static let Longitude = "longitude"
+        static let Price = "price"
+        static let PriceCurrency = "price_currency"
+        static let PriceFormatted = "price_formatted"
+        static let PriceType = "price_type"
+        static let PropertyType = "property_type"
+        static let Summary = "summary"
+        static let Title = "title"
+        static let UpdatedDays = "updated_in_days"
+        
+    }
+    
 }
