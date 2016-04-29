@@ -10,12 +10,11 @@ import UIKit
 import MapKit
 import CoreData
 
-class imageAnnotation : MKPointAnnotation {
+class PropAnnotation : MKPointAnnotation {
     
     var propertyImage : UIImage?
     var guid : String?
     var saved : Bool?
-
     
 }
 
@@ -70,14 +69,55 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         
     }
     
-    
-    @IBAction func didPushButton(sender: AnyObject) {
+    func initSearchWithParam(location: String!, bedroom: String?, price: String?, pref: String?) {
         
-        initSearchWithParam("stratford", bedroom: nil, price: nil, pref: nil)
+        clearTempObjects { (done) -> Void in
         
+            let parameters = NestoriaClient.sharedInstance().methodArgumentsWithExtendedParams(location, bedroom: bedroom, price: price, pref: pref)
+        
+            NestoriaClient.sharedInstance().taskForSearchListing(parameters) { (result, error) in
+            
+                if (error != nil) {
+                
+                    self.displayAlert("Nestoria Error", message: "Connection failure.")
+                
+                } else {
+                    let parsedResult = result as! [String: AnyObject]
+                    if let propDictionaries = parsedResult["response"]!["listings"] as? [[String: AnyObject]] {
+                    
+                        self.temporaryContext.performBlockAndWait {
+                        
+                            self.searchResult = propDictionaries.map() {
+                            Property(dictionary: $0, context: self.temporaryContext)
+                            }
+                        }
+                    
+                        dispatch_async(dispatch_get_main_queue(), {
+                        
+                            self.displayTempProperties() { (done) in
+                        
+                                //find temp pins
+                                let allAnnotations = self.mapView.annotations as! [PropAnnotation]
+                                var tempPins : [MKAnnotation] = []
+                                for annotation in allAnnotations {
+                                    if (annotation.saved == false) {
+                                        tempPins.append(annotation)
+                                    }
+                                }
+                                //zoom map to new pins
+                                self.setMapViewSpan(tempPins)
+                            }
+                        })
+                    } else {
+                        self.displayAlert("Nestoria Error", message: "Cannot parse JSON.")
+                    }
+                }
+            }
+        }
     }
     
-    func initSearchWithParam(location: String!, bedroom: String?, price: String?, pref: String?) {
+    
+    func clearTempObjects(completionHandler: (done: Bool)->Void) {
         
         //clear temp context
         let fetchPin = NSFetchRequest(entityName: "Property")
@@ -105,53 +145,17 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         let allAnnotations = mapView.annotations
         var annotationsToDelete : [MKAnnotation] = []
         for annotation in allAnnotations {
-            let imageAnn = annotation as? imageAnnotation
-            if ((imageAnn) != nil) {
-                if (imageAnn?.saved! == false) {
+            let propAnn = annotation as? PropAnnotation
+            if ((propAnn) != nil) {
+                if (propAnn?.saved! == false) {
                     annotationsToDelete.append(annotation)
                 }
             }
         }
         mapView.removeAnnotations(annotationsToDelete)
         
-        let parameters = NestoriaClient.sharedInstance().methodArgumentsWithExtendedParams(location, bedroom: bedroom, price: price, pref: pref)
+        completionHandler(done: true)
         
-        NestoriaClient.sharedInstance().taskForSearchListing(parameters) { (result, error) in
-            
-            if (error != nil) {
-                
-                print("nestoria error")
-                
-            } else {
-                let parsedResult = result as! [String: AnyObject]
-                if let propDictionaries = parsedResult["response"]!["listings"] as? [[String: AnyObject]] {
-                    
-                    self.temporaryContext.performBlockAndWait {
-                        
-                        self.searchResult = propDictionaries.map() {
-                            Property(dictionary: $0, context: self.temporaryContext)
-                        }
-                    }
-                    
-                    dispatch_async(dispatch_get_main_queue(), {
-                        
-                        self.displayTempProperties() { (done) in
-                        
-                            //find temp pins
-                            let allAnnotations = self.mapView.annotations as! [imageAnnotation]
-                            var tempPins : [MKAnnotation] = []
-                            for annotation in allAnnotations {
-                                if (annotation.saved == false) {
-                                    tempPins.append(annotation)
-                                }
-                            }
-                            //zoom map to new pins
-                            self.setMapViewSpan(tempPins)
-                        }
-                    })
-                }
-            }
-        }
     }
     
     
@@ -159,7 +163,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
     
     func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
         
-        let userAnnotation = annotation as! imageAnnotation
+        let userAnnotation = annotation as! PropAnnotation
         var reuseId = userAnnotation.guid!
         if (userAnnotation.saved! == true) {
             reuseId += "saved"
@@ -212,7 +216,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
     func mapView(mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
         if control == view.rightCalloutAccessoryView {
             
-            let annotation = view.annotation as? imageAnnotation
+            let annotation = view.annotation as? PropAnnotation
             
             let guid = annotation?.guid
             
@@ -252,7 +256,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         if let props = props {
              for currentProp in props {
                 
-                let newAnotation = imageAnnotation()
+                let newAnotation = PropAnnotation()
                 newAnotation.coordinate = currentProp.coordinate!
                 newAnotation.title = currentProp.price_formatted
                 newAnotation.guid = currentProp.guid
@@ -269,17 +273,21 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
                     NestoriaClient.sharedInstance().taskForDownloadImage(currentProp.img_url!) { (image, error) in
                         
                         if (error != nil) {
+                            
                             print("error downloading image")
+                            currentProp.nestoriaImage = UIImage(named: "placeholderHouse")
+                            newAnotation.propertyImage = UIImage(named: "placeholderHouse")
+                            
                         } else {
                             
                             currentProp.nestoriaImage = image
                             newAnotation.propertyImage = image
                             
-                            dispatch_async(dispatch_get_main_queue(), {
-                                self.mapView.addAnnotation(newAnotation)
-                            })
                         }
                         
+                        dispatch_async(dispatch_get_main_queue(), {
+                            self.mapView.addAnnotation(newAnotation)
+                        })
                     }
                 }
                 
@@ -338,18 +346,21 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
             displayNewPins(propsToDisplay, saved: false)
             completionHandler(done: true)
         }
-        
     }
     
     func setMapViewSpan(annotations: [MKAnnotation]) {
         
-
             var maxLat = -90.0
             var minLat = 90.0
             var maxLon = -180.0
             var minLon = 180.0
         
         if (annotations.count > 0) {
+            maxLat = annotations[0].coordinate.latitude
+            minLat = annotations[0].coordinate.latitude
+            maxLon = annotations[0].coordinate.longitude
+            minLon = annotations[0].coordinate.longitude
+
             for annotation in annotations {
                 let thisLat = annotation.coordinate.latitude
                 let thisLon = annotation.coordinate.longitude
@@ -380,6 +391,14 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         region.span = span
         self.mapView.setRegion(region, animated: true)
         
+    }
+    
+    func displayAlert(title: String!, message: String!) {
+        let alertController = UIAlertController(title: title, message:
+            message, preferredStyle: UIAlertControllerStyle.Alert)
+        alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
+        
+        self.presentViewController(alertController, animated: true, completion: nil)
     }
 
 }

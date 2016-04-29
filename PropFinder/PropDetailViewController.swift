@@ -51,7 +51,7 @@ class PropDetailViewController: UIViewController {
     
     func configMap() {
         //add pin
-        let annotation = imageAnnotation()
+        let annotation = PropAnnotation()
         annotation.coordinate = (thisProperty?.coordinate!)!
         detailMapView.addAnnotation(annotation)
         

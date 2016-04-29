@@ -48,6 +48,9 @@
                             </label>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="Z0L-Vu-6dc">
                                 <rect key="frame" x="-60" y="-14" width="121" height="29"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="311" id="7ZN-ED-wNW"/>
+                                </constraints>
                                 <segments>
                                     <segment title="Low Price"/>
                                     <segment title="High Price"/>
@@ -55,6 +58,17 @@
                                     <segment title="Ranking"/>
                                 </segments>
                                 <color key="tintColor" red="0.0" green="0.24473049499999999" blue="0.50251677849999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="7ZN-ED-wNW"/>
+                                    </mask>
+                                </variation>
+                                <variation key="widthClass=compact" misplaced="YES">
+                                    <rect key="frame" x="41" y="334" width="311" height="29"/>
+                                    <mask key="constraints">
+                                        <include reference="7ZN-ED-wNW"/>
+                                    </mask>
+                                </variation>
                             </segmentedControl>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cjv-Yl-EGO">
                                 <rect key="frame" x="-23" y="-15" width="46" height="30"/>
@@ -80,6 +94,9 @@
                             </button>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="POp-Gz-n7e">
                                 <rect key="frame" x="-60" y="-14" width="121" height="29"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="311" id="PTw-jN-XAn"/>
+                                </constraints>
                                 <segments>
                                     <segment title="1"/>
                                     <segment title="2"/>
@@ -88,9 +105,23 @@
                                     <segment title="All"/>
                                 </segments>
                                 <color key="tintColor" red="0.0" green="0.24473049499999999" blue="0.50251677849999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="PTw-jN-XAn"/>
+                                    </mask>
+                                </variation>
+                                <variation key="widthClass=compact" misplaced="YES">
+                                    <rect key="frame" x="41" y="154" width="311" height="29"/>
+                                    <mask key="constraints">
+                                        <include reference="PTw-jN-XAn"/>
+                                    </mask>
+                                </variation>
                             </segmentedControl>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="DVV-PX-ndk">
                                 <rect key="frame" x="-60" y="-14" width="121" height="29"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="311" id="m7d-Zk-giO"/>
+                                </constraints>
                                 <segments>
                                     <segment title="500k"/>
                                     <segment title="750k"/>
@@ -99,6 +130,17 @@
                                     <segment title="All"/>
                                 </segments>
                                 <color key="tintColor" red="0.0" green="0.24473049499999999" blue="0.50251677849999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="m7d-Zk-giO"/>
+                                    </mask>
+                                </variation>
+                                <variation key="widthClass=compact" misplaced="YES">
+                                    <rect key="frame" x="41" y="239" width="311" height="29"/>
+                                    <mask key="constraints">
+                                        <include reference="m7d-Zk-giO"/>
+                                    </mask>
+                                </variation>
                             </segmentedControl>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Preference" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Nfb-eb-JHW">
                                 <rect key="frame" x="-42" y="-21" width="42" height="21"/>
@@ -129,11 +171,11 @@
                             <constraint firstItem="hcq-w4-hLg" firstAttribute="top" secondItem="POp-Gz-n7e" secondAttribute="bottom" constant="31" id="1Y8-jy-dgK"/>
                             <constraint firstItem="TZl-UJ-POQ" firstAttribute="top" secondItem="aoe-UV-2y8" secondAttribute="bottom" constant="51" id="2Nd-aW-a7U"/>
                             <constraint firstItem="TZl-UJ-POQ" firstAttribute="leading" secondItem="oGW-Z1-jOw" secondAttribute="trailing" constant="10" id="F6E-sn-ySY"/>
+                            <constraint firstItem="POp-Gz-n7e" firstAttribute="centerX" secondItem="Ixk-Ir-Xg0" secondAttribute="centerX" id="FzA-2H-Fse"/>
                             <constraint firstItem="Nfb-eb-JHW" firstAttribute="top" secondItem="DVV-PX-ndk" secondAttribute="bottom" constant="36" id="H17-TQ-Rus"/>
-                            <constraint firstItem="DVV-PX-ndk" firstAttribute="leading" secondItem="Ixk-Ir-Xg0" secondAttribute="leadingMargin" constant="21" id="JgJ-gP-5y3"/>
-                            <constraint firstItem="Z0L-Vu-6dc" firstAttribute="leading" secondItem="Ixk-Ir-Xg0" secondAttribute="leadingMargin" constant="21" id="KwF-qs-QpS"/>
+                            <constraint firstItem="Z0L-Vu-6dc" firstAttribute="centerX" secondItem="Ixk-Ir-Xg0" secondAttribute="centerX" id="JtP-Ed-cOx"/>
+                            <constraint firstItem="DVV-PX-ndk" firstAttribute="centerX" secondItem="Ixk-Ir-Xg0" secondAttribute="centerX" id="ODo-Pn-4fr"/>
                             <constraint firstAttribute="trailingMargin" secondItem="TZl-UJ-POQ" secondAttribute="trailing" constant="28" id="OZf-AX-c16"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="DVV-PX-ndk" secondAttribute="trailing" constant="28" id="Oxt-QV-zl1"/>
                             <constraint firstItem="oGW-Z1-jOw" firstAttribute="leading" secondItem="pAA-RF-psn" secondAttribute="trailing" constant="8" id="PS2-5b-HjN"/>
                             <constraint firstItem="Z0L-Vu-6dc" firstAttribute="top" secondItem="Nfb-eb-JHW" secondAttribute="bottom" constant="13" id="XuV-4B-w4r"/>
                             <constraint firstItem="IJq-YX-FmD" firstAttribute="top" secondItem="cjv-Yl-EGO" secondAttribute="bottom" id="YJp-PX-iqb"/>
@@ -142,14 +184,11 @@
                             <constraint firstItem="Nfb-eb-JHW" firstAttribute="leading" secondItem="Ixk-Ir-Xg0" secondAttribute="leadingMargin" constant="21" id="jwe-4z-G4v"/>
                             <constraint firstItem="POp-Gz-n7e" firstAttribute="top" secondItem="8Cf-Q1-714" secondAttribute="bottom" constant="8" id="nBy-vl-A0t"/>
                             <constraint firstItem="pAA-RF-psn" firstAttribute="leading" secondItem="Ixk-Ir-Xg0" secondAttribute="leadingMargin" constant="21" id="nim-cP-TrF"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="Z0L-Vu-6dc" secondAttribute="trailing" constant="28" id="qsp-Nf-frO"/>
                             <constraint firstItem="8Cf-Q1-714" firstAttribute="leading" secondItem="Ixk-Ir-Xg0" secondAttribute="leadingMargin" constant="21" id="swM-qc-n0Z"/>
                             <constraint firstItem="8Cf-Q1-714" firstAttribute="top" secondItem="pAA-RF-psn" secondAttribute="bottom" constant="38" id="t6K-2G-6iR"/>
                             <constraint firstAttribute="trailingMargin" secondItem="cjv-Yl-EGO" secondAttribute="trailing" constant="-20" id="tYJ-gp-5Ra"/>
                             <constraint firstItem="oGW-Z1-jOw" firstAttribute="top" secondItem="aoe-UV-2y8" secondAttribute="bottom" constant="48" id="uBH-kh-Z6K"/>
                             <constraint firstItem="hcq-w4-hLg" firstAttribute="leading" secondItem="Ixk-Ir-Xg0" secondAttribute="leadingMargin" constant="21" id="ueV-qQ-IT1"/>
-                            <constraint firstItem="POp-Gz-n7e" firstAttribute="leading" secondItem="Ixk-Ir-Xg0" secondAttribute="leadingMargin" constant="21" id="unI-FB-oWl"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="POp-Gz-n7e" secondAttribute="trailing" constant="28" id="vJN-5E-Kip"/>
                             <constraint firstItem="pAA-RF-psn" firstAttribute="top" secondItem="aoe-UV-2y8" secondAttribute="bottom" constant="52" id="ysK-Vd-2XQ"/>
                         </constraints>
                         <variation key="default">
@@ -172,22 +211,19 @@
                                 <exclude reference="uBH-kh-Z6K"/>
                                 <exclude reference="swM-qc-n0Z"/>
                                 <exclude reference="t6K-2G-6iR"/>
+                                <exclude reference="FzA-2H-Fse"/>
                                 <exclude reference="nBy-vl-A0t"/>
-                                <exclude reference="unI-FB-oWl"/>
-                                <exclude reference="vJN-5E-Kip"/>
                                 <exclude reference="1Y8-jy-dgK"/>
                                 <exclude reference="ueV-qQ-IT1"/>
-                                <exclude reference="JgJ-gP-5y3"/>
-                                <exclude reference="Oxt-QV-zl1"/>
+                                <exclude reference="ODo-Pn-4fr"/>
                                 <exclude reference="Zpl-sT-cDS"/>
                                 <exclude reference="H17-TQ-Rus"/>
                                 <exclude reference="jwe-4z-G4v"/>
                                 <exclude reference="2Nd-aW-a7U"/>
                                 <exclude reference="F6E-sn-ySY"/>
                                 <exclude reference="OZf-AX-c16"/>
-                                <exclude reference="KwF-qs-QpS"/>
+                                <exclude reference="JtP-Ed-cOx"/>
                                 <exclude reference="XuV-4B-w4r"/>
-                                <exclude reference="qsp-Nf-frO"/>
                                 <exclude reference="jS5-8I-INB"/>
                                 <exclude reference="tYJ-gp-5Ra"/>
                                 <exclude reference="YJp-PX-iqb"/>
@@ -213,22 +249,19 @@
                                 <include reference="uBH-kh-Z6K"/>
                                 <include reference="swM-qc-n0Z"/>
                                 <include reference="t6K-2G-6iR"/>
+                                <include reference="FzA-2H-Fse"/>
                                 <include reference="nBy-vl-A0t"/>
-                                <include reference="unI-FB-oWl"/>
-                                <include reference="vJN-5E-Kip"/>
                                 <include reference="1Y8-jy-dgK"/>
                                 <include reference="ueV-qQ-IT1"/>
-                                <include reference="JgJ-gP-5y3"/>
-                                <include reference="Oxt-QV-zl1"/>
+                                <include reference="ODo-Pn-4fr"/>
                                 <include reference="Zpl-sT-cDS"/>
                                 <include reference="H17-TQ-Rus"/>
                                 <include reference="jwe-4z-G4v"/>
                                 <include reference="2Nd-aW-a7U"/>
                                 <include reference="F6E-sn-ySY"/>
                                 <include reference="OZf-AX-c16"/>
-                                <include reference="KwF-qs-QpS"/>
+                                <include reference="JtP-Ed-cOx"/>
                                 <include reference="XuV-4B-w4r"/>
-                                <include reference="qsp-Nf-frO"/>
                                 <include reference="jS5-8I-INB"/>
                                 <include reference="tYJ-gp-5Ra"/>
                                 <include reference="YJp-PX-iqb"/>
