@@ -15,17 +15,22 @@ class imageAnnotation : MKPointAnnotation {
     var propertyImage : UIImage?
     var guid : String?
     var saved : Bool?
+
     
 }
 
 class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
-
     
     @IBOutlet var mapView: MKMapView!
     var searchResult = [Property]() //To display only the current search results
+    //var searchResultPins = [MKAnnotation]()
     var temporaryContext: NSManagedObjectContext!
     
     var guidList : [String] = []
+    
+    var searchLocation : String?
+    
+    var firstLoad : Bool = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,28 +44,77 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         temporaryContext = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.MainQueueConcurrencyType)
         temporaryContext.persistentStoreCoordinator = sharedContext.persistentStoreCoordinator
         
+        //config map when first loaded
+        if (firstLoad == true) {
+            fetchPersistentProperties()
+            let annotations = mapView.annotations
+            setMapViewSpan(annotations)
+            firstLoad = false
+        }
+        
     }
     
     override func viewWillAppear(animated: Bool) {
-        
-        guidList = []
-        
-        //delete all annotations
-        let allAnnotations = mapView.annotations
-        mapView.removeAnnotations(allAnnotations)
-        
-        fetchPersistentProperties()
-        
-        displayTempProperties()
+        if (firstLoad == false) {
+            guidList = []
+            
+            //delete all annotations
+            let allAnnotations = mapView.annotations
+            mapView.removeAnnotations(allAnnotations)
+            
+            fetchPersistentProperties()
+            
+            displayTempProperties() {(done) in }
+            
+        }
         
     }
     
     
     @IBAction func didPushButton(sender: AnyObject) {
         
-        //clear temp context
+        initSearchWithParam("stratford", bedroom: nil, price: nil, pref: nil)
         
-        let parameters = NestoriaClient.sharedInstance().methodArgumentsWithPlaceName("greenwich")
+    }
+    
+    func initSearchWithParam(location: String!, bedroom: String?, price: String?, pref: String?) {
+        
+        //clear temp context
+        let fetchPin = NSFetchRequest(entityName: "Property")
+        fetchPin.sortDescriptors = [NSSortDescriptor(key: "guid", ascending: true)]
+        
+        let fetchedPinResultsController = NSFetchedResultsController(fetchRequest: fetchPin,
+            managedObjectContext: self.temporaryContext,
+            sectionNameKeyPath: nil,
+            cacheName: nil)
+        
+        // Fetch
+        do {
+            try fetchedPinResultsController.performFetch()
+        } catch {}
+        
+        // Delete objects from temp context
+        if (fetchedPinResultsController.fetchedObjects!.count > 0) {
+            let objects = fetchedPinResultsController.fetchedObjects! as! [NSManagedObject]
+            for object in objects {
+                self.temporaryContext.deleteObject(object)
+            }
+        }
+        
+        //delete temp pins
+        let allAnnotations = mapView.annotations
+        var annotationsToDelete : [MKAnnotation] = []
+        for annotation in allAnnotations {
+            let imageAnn = annotation as? imageAnnotation
+            if ((imageAnn) != nil) {
+                if (imageAnn?.saved! == false) {
+                    annotationsToDelete.append(annotation)
+                }
+            }
+        }
+        mapView.removeAnnotations(annotationsToDelete)
+        
+        let parameters = NestoriaClient.sharedInstance().methodArgumentsWithExtendedParams(location, bedroom: bedroom, price: price, pref: pref)
         
         NestoriaClient.sharedInstance().taskForSearchListing(parameters) { (result, error) in
             
@@ -73,16 +127,27 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
                 if let propDictionaries = parsedResult["response"]!["listings"] as? [[String: AnyObject]] {
                     
                     self.temporaryContext.performBlockAndWait {
-                    
+                        
                         self.searchResult = propDictionaries.map() {
                             Property(dictionary: $0, context: self.temporaryContext)
                         }
                     }
                     
                     dispatch_async(dispatch_get_main_queue(), {
-                     
-                        self.displayTempProperties()
                         
+                        self.displayTempProperties() { (done) in
+                        
+                            //find temp pins
+                            let allAnnotations = self.mapView.annotations as! [imageAnnotation]
+                            var tempPins : [MKAnnotation] = []
+                            for annotation in allAnnotations {
+                                if (annotation.saved == false) {
+                                    tempPins.append(annotation)
+                                }
+                            }
+                            //zoom map to new pins
+                            self.setMapViewSpan(tempPins)
+                        }
                     })
                 }
             }
@@ -134,7 +199,6 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
             pinView!.detailCalloutAccessoryView = button
             
             pinView!.rightCalloutAccessoryView = UIButton(type: .DetailDisclosure)
-            
             
             
         }
@@ -260,10 +324,9 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
             }
             displayNewPins(props, saved: true)
         }
-
     }
     
-    func displayTempProperties() {
+    func displayTempProperties(completionHandler: (done: Bool)->Void) {
         if (self.searchResult.count > 0) {
             var propsToDisplay : [Property]? = []
             for prop in self.searchResult {
@@ -273,8 +336,49 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
                 }
             }
             displayNewPins(propsToDisplay, saved: false)
+            completionHandler(done: true)
+        }
+        
+    }
+    
+    func setMapViewSpan(annotations: [MKAnnotation]) {
+        
+
+            var maxLat = -90.0
+            var minLat = 90.0
+            var maxLon = -180.0
+            var minLon = 180.0
+        
+        if (annotations.count > 0) {
+            for annotation in annotations {
+                let thisLat = annotation.coordinate.latitude
+                let thisLon = annotation.coordinate.longitude
+                if (thisLat > maxLat) { maxLat = thisLat}
+                else if (thisLat < minLat) { minLat = thisLat }
+                if (thisLon > maxLon) { maxLon = thisLon }
+                else if (thisLon < minLon) { minLon = thisLon }
+            }
+        } else {
+            // London
+            maxLat = 51.5074 + 0.1
+            minLat = 51.5074 - 0.1
+            maxLon = 0.1278 + 0.1
+            minLon = 0.1278 - 0.1
             
         }
+        
+        //config span
+        var span = MKCoordinateSpan()
+        var region = MKCoordinateRegion()
+        let lat = (minLat + maxLat)/2
+        let lon = (minLon + maxLon)/2
+        region.center = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+        let latDelta = maxLat - minLat + 0.01
+        let lonDelta = maxLon - minLon + 0.01
+        span.latitudeDelta = latDelta
+        span.longitudeDelta = lonDelta
+        region.span = span
+        self.mapView.setRegion(region, animated: true)
         
     }
 

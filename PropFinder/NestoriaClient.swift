@@ -35,6 +35,7 @@ class NestoriaClient : NSObject {
         
         let urlString = Constants.BASE_URL + escapedParameters(methodArguments)
         let url = NSURL(string: urlString)
+        print(url)
         
         let request = NSURLRequest(URL: url!)
         
@@ -95,6 +96,41 @@ class NestoriaClient : NSObject {
         return methodArguments
         
     }
+    
+    func methodArgumentsWithExtendedParams(placeName : String?, bedroom: String?, price: String?, pref: String?) -> [String : AnyObject]{
+        
+        var methodArguments : [String : AnyObject] = [
+            JSONKeys.Method : Constants.SEARCH_LISTINGS,
+            JSONKeys.Country : Constants.COUNTRY,
+            JSONKeys.Endoding : Constants.ENCODING,
+            JSONKeys.Pretty : Constants.PRETTY,
+            JSONKeys.Listing_Type : Constants.LISTINGTYPE,
+        ]
+        
+        if let placeName = placeName {
+            methodArguments[JSONKeys.Place_Name] = placeName
+        }
+        
+        if let bedroom = bedroom {
+            methodArguments[JSONKeys.BedroomMin] = bedroom
+        }
+        
+        if let bedroom = bedroom {
+            methodArguments[JSONKeys.BedroomMin] = bedroom
+        }
+        
+        if let price = price {
+            methodArguments[JSONKeys.PriceMax] = price
+        }
+        
+        if let pref = pref {
+            methodArguments[JSONKeys.Sort] = pref
+        }
+        
+        return methodArguments
+        
+    }
+
     
     // Parsing the JSON
     

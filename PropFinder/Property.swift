@@ -92,7 +92,7 @@ class Property : NSManagedObject {
         construction_year = dictionary[Keys.ConstructionYear] as? String
         datasource_name = dictionary[Keys.DatasourceName] as? String
         floor = dictionary[Keys.Floor] as? NSNumber
-        guid = dictionary[Keys.Guid] as? String
+        guid = dictionary[Keys.ImgURL] as? String
         img_url = dictionary[Keys.ImgURL] as? String
         
         latitude = dictionary[Keys.Latitude] as? NSNumber
@@ -112,56 +112,28 @@ class Property : NSManagedObject {
         
     }
     
-//    lazy var dictionary : [String: AnyObject?] {
-//        get {
-//            let dict : [String: AnyObject?] = [
-//                Keys.AuctionDate : auction_date,
-//                Keys.Keywords : keywords,
-//                Keys.BathroomNumber : bathroom_number,
-//                Keys.BedroomNumber : bedroom_number,
-//                Keys.CarSpaces : car_spaces,
-//                Keys.Commission : commission,
-//                Keys.ConstructionYear : construction_year,
-//                Keys.DatasourceName : datasource_name,
-//                Keys.Floor : floor,
-//                Keys.Guid : guid,
-//                Keys.ImgURL : img_url,
-//                Keys.Latitude : latitude,
-//                Keys.ListerName : lister_name,
-//                Keys.ListerURL : lister_url,
-//                Keys.ListingType : listing_type,
-//                Keys.LocationAccuracy : location_accuracy,
-//                Keys.Longitude : longitude,
-//                Keys.Price : price,
-//                Keys.PriceCurrency : price_currency,
-//                Keys.PriceFormatted : price_formatted,
-//                Keys.PriceType : price_type,
-//                Keys.PropertyType : property_type,
-//                Keys.Summary : summary,
-//                Keys.Title : title,
-//                Keys.UpdatedDays : updated_in_days
-//            ]
-//            return dict
-//        }
-//        
-//    }
     
     var nestoriaImage: UIImage? {
         
         get {
+            if let img_url = img_url {
+                let imageURL = NSURL(fileURLWithPath: img_url)
+                let fileName = imageURL.lastPathComponent
             
-            let imageURL = NSURL(fileURLWithPath: img_url!)
-            let fileName = imageURL.lastPathComponent
-            
-            return NestoriaClient.Caches.imageCache.imageWithIdentifier(fileName)
+                return NestoriaClient.Caches.imageCache.imageWithIdentifier(fileName)
+            } else {
+                return UIImage(named: "placeholderHouse")
+            }
         }
         
         set {
             
-            let imageURL = NSURL(fileURLWithPath: img_url!)
-            let fileName = imageURL.lastPathComponent
-            
-            NestoriaClient.Caches.imageCache.storeImage(newValue, withIdentifier: fileName!)
+                if let img_url = img_url {
+                    let imageURL = NSURL(fileURLWithPath: img_url)
+                    let fileName = imageURL.lastPathComponent
+                    print("image cached")
+                    NestoriaClient.Caches.imageCache.storeImage(newValue, withIdentifier: fileName!)
+                }
         }
     }
     
@@ -190,7 +162,7 @@ class Property : NSManagedObject {
         }
         
     }
-
     
+
     
 }
