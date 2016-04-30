@@ -78,6 +78,10 @@ class SearchViewController: UIViewController, UITextFieldDelegate {
         let VCs = tabBarController?.viewControllers
         let nav = VCs![0] as? UINavigationController
         let mapVC = nav?.viewControllers[0] as? MapViewController
+        
+        //var error: NSError?
+        //mapVC?.temporaryContext.deleteAllObjects(&error)
+        
         mapVC?.initSearchWithParam(location, bedroom: bedroom, price: price, pref: pref)
         tabBarController?.selectedIndex = 0
     }
@@ -140,5 +144,12 @@ class SearchViewController: UIViewController, UITextFieldDelegate {
         return (location, bedroom, price, pref)
         
     }
+    
+    func initSearchWithParam(location: String!, bedroom: String?, price: String?, pref: String?) {
+        let parameters = NestoriaClient.sharedInstance().methodArgumentsWithExtendedParams(location, bedroom: bedroom, price: price, pref: pref)
+        
+        
+    }
+    
     
 }

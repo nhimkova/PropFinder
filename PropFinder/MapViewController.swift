@@ -18,6 +18,10 @@ class PropAnnotation : MKPointAnnotation {
     
 }
 
+protocol MapViewControllerDelegate {
+    func initSearchWithParam(location: String!, bedroom: String?, price: String?, pref: String?)
+}
+
 class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
     
     @IBOutlet var mapView: MKMapView!
@@ -45,9 +49,8 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         
         //config map when first loaded
         if (firstLoad == true) {
-            fetchPersistentProperties()
-            let annotations = mapView.annotations
-            setMapViewSpan(annotations)
+            fetchPersistentProperties(true)
+
             firstLoad = false
         }
         
@@ -61,7 +64,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
             let allAnnotations = mapView.annotations
             mapView.removeAnnotations(allAnnotations)
             
-            fetchPersistentProperties()
+            fetchPersistentProperties(false)
             
             displayTempProperties() {(done) in }
             
@@ -85,27 +88,31 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
                     let parsedResult = result as! [String: AnyObject]
                     if let propDictionaries = parsedResult["response"]!["listings"] as? [[String: AnyObject]] {
                     
-                        self.temporaryContext.performBlockAndWait {
+                        dispatch_async(dispatch_get_main_queue(), {
+                        //self.temporaryContext.performBlockAndWait {
                         
                             self.searchResult = propDictionaries.map() {
                             Property(dictionary: $0, context: self.temporaryContext)
                             }
-                        }
-                    
-                        dispatch_async(dispatch_get_main_queue(), {
+                        //}
+                            print("1 - searchresults: \(self.searchResult.count)")
+                        //dispatch_async(dispatch_get_main_queue(), {
                         
                             self.displayTempProperties() { (done) in
-                        
-                                //find temp pins
-                                let allAnnotations = self.mapView.annotations as! [PropAnnotation]
-                                var tempPins : [MKAnnotation] = []
-                                for annotation in allAnnotations {
-                                    if (annotation.saved == false) {
-                                        tempPins.append(annotation)
-                                    }
-                                }
-                                //zoom map to new pins
-                                self.setMapViewSpan(tempPins)
+                                
+                                dispatch_async(dispatch_get_main_queue(), {
+//                                    //find temp pins
+//                                    let allAnnotations = self.mapView.annotations as! [PropAnnotation]
+//                                    var tempPins : [MKAnnotation] = []
+//                                    for annotation in allAnnotations {
+//                                        if (annotation.saved == false) {
+//                                            tempPins.append(annotation)
+//                                        }
+//                                    }
+//                                    print("3 - temp pins: \(tempPins.count)")
+//                                    //zoom map to new pins
+                                    self.setMapViewSpan(self.searchResult)
+                                    })
                             }
                         })
                     } else {
@@ -251,11 +258,13 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         }
     }
     
-    func displayNewPins(props: [Property]?, saved: Bool) {
+    func displayNewPins(props: [Property]?, saved: Bool, completionHandler: (done: Bool)->Void) {
         
         if let props = props {
+             let totalProps = props.count
+             var count = 0
              for currentProp in props {
-                
+                count += 1
                 let newAnotation = PropAnnotation()
                 newAnotation.coordinate = currentProp.coordinate!
                 newAnotation.title = currentProp.price_formatted
@@ -267,6 +276,10 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
                     newAnotation.propertyImage = currentProp.nestoriaImage
                     //add pin to map
                     self.mapView.addAnnotation(newAnotation)
+                    if (count == totalProps) {
+                        print("displayNewPins completed")
+                        completionHandler(done: true)
+                    }
                     
                 } else {
                     //download image
@@ -287,6 +300,12 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
                         
                         dispatch_async(dispatch_get_main_queue(), {
                             self.mapView.addAnnotation(newAnotation)
+                            print("added annotation number \(count)")
+                            if (count == totalProps) {
+                                print("displayNewPins completed")
+                                completionHandler(done: true)
+                            }
+                            
                         })
                     }
                 }
@@ -318,7 +337,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         
     }()
     
-    func fetchPersistentProperties() {
+    func fetchPersistentProperties(setMapSpan: Bool) {
         
         // Fetch
         do {
@@ -330,7 +349,10 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
             for prop in props! {
                 self.guidList.append(prop.guid!)
             }
-            displayNewPins(props, saved: true)
+            displayNewPins(props, saved: true) { (done) in }
+            if (setMapSpan == true) {
+                setMapViewSpan(props!)
+            }
         }
     }
     
@@ -343,27 +365,31 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
                     propsToDisplay?.append(prop)
                 }
             }
-            displayNewPins(propsToDisplay, saved: false)
-            completionHandler(done: true)
+            print("2 - Number of props to display: \(propsToDisplay!.count)")
+            displayNewPins(propsToDisplay, saved: false) { (done) in
+                print("displayTempProperties completed")
+                completionHandler(done: true)
+            }
         }
     }
     
-    func setMapViewSpan(annotations: [MKAnnotation]) {
+    func setMapViewSpan(props: [Property]) {
         
+        print("setmapspan")
             var maxLat = -90.0
             var minLat = 90.0
             var maxLon = -180.0
             var minLon = 180.0
         
-        if (annotations.count > 0) {
-            maxLat = annotations[0].coordinate.latitude
-            minLat = annotations[0].coordinate.latitude
-            maxLon = annotations[0].coordinate.longitude
-            minLon = annotations[0].coordinate.longitude
+        if (props.count > 0) {
+            maxLat = props[0].coordinate!.latitude
+            minLat = props[0].coordinate!.latitude
+            maxLon = props[0].coordinate!.longitude
+            minLon = props[0].coordinate!.longitude
 
-            for annotation in annotations {
-                let thisLat = annotation.coordinate.latitude
-                let thisLon = annotation.coordinate.longitude
+            for prop in props {
+                let thisLat = prop.coordinate!.latitude
+                let thisLon = prop.coordinate!.longitude
                 if (thisLat > maxLat) { maxLat = thisLat}
                 else if (thisLat < minLat) { minLat = thisLat }
                 if (thisLon > maxLon) { maxLon = thisLon }
