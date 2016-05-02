@@ -13,19 +13,15 @@ class SearchViewController: UIViewController, UITextFieldDelegate {
     
     
     @IBOutlet var locationTextField: UITextField!
-    
     @IBOutlet var bedroomControl: UISegmentedControl!
-
     @IBOutlet var priceControl: UISegmentedControl!
-    
     @IBOutlet var resultControl: UISegmentedControl!
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         locationTextField.delegate = self
-        
+        locationTextField.text = "Current Map Location"
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -65,25 +61,36 @@ class SearchViewController: UIViewController, UITextFieldDelegate {
         view.endEditing(true)
     }
 
-    
     @IBAction func didPushSearch(sender: AnyObject) {
         
         var location : String?
         var bedroom : String?
         var price : String?
         var pref : String?
+        var lon : String?
+        var lat : String?
         
         (location, bedroom, price, pref) = getParams()
         
-        let VCs = tabBarController?.viewControllers
-        let nav = VCs![0] as? UINavigationController
-        let mapVC = nav?.viewControllers[0] as? MapViewController
-        
-        //var error: NSError?
-        //mapVC?.temporaryContext.deleteAllObjects(&error)
-        
-        mapVC?.initSearchWithParam(location, bedroom: bedroom, price: price, pref: pref)
-        tabBarController?.selectedIndex = 0
+        if (location == "") {
+            displayAlert("Error", message: "Please enter location or use current map location.")
+        } else {
+            
+            let VCs = tabBarController?.viewControllers
+            let nav = VCs![0] as? UINavigationController
+            let mapVC = nav?.viewControllers[0] as? MapViewController
+
+            if (location == "Current Map Location") {
+                //get mapview location
+                let coordinate = mapVC?.mapView.centerCoordinate
+                lon = String((coordinate?.longitude)!)
+                lat = String((coordinate?.latitude)!)
+                location = nil
+            }
+            
+            mapVC?.initSearchWithParam(location, longitude: lon, latitude: lat, bedroom: bedroom, price: price, pref: pref)
+            tabBarController?.selectedIndex = 0
+        }
     }
     
     func getParams()->(location: String?, bedroom: String?, price: String?, pref: String?) {
@@ -125,7 +132,6 @@ class SearchViewController: UIViewController, UITextFieldDelegate {
             price = "max"
         }
         
-        
         let prefIndex = resultControl.selectedSegmentIndex
         var pref : String?
         if (prefIndex == 0) {
@@ -145,10 +151,17 @@ class SearchViewController: UIViewController, UITextFieldDelegate {
         
     }
     
-    func initSearchWithParam(location: String!, bedroom: String?, price: String?, pref: String?) {
-        let parameters = NestoriaClient.sharedInstance().methodArgumentsWithExtendedParams(location, bedroom: bedroom, price: price, pref: pref)
+    @IBAction func didPushCurrentLocation(sender: AnyObject) {
+        locationTextField.text = "Current Map Location"
+    }
+    
+    
+    func displayAlert(title: String!, message: String!) {
+        let alertController = UIAlertController(title: title, message:
+            message, preferredStyle: UIAlertControllerStyle.Alert)
+        alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default,handler: nil))
         
-        
+        self.presentViewController(alertController, animated: true, completion: nil)
     }
     
     

@@ -85,7 +85,6 @@ class Property : NSManagedObject {
         keywords = dictionary[Keys.Keywords] as? String
 
         bathroom_number = dictionary[Keys.BathroomNumber] as? NSNumber
-        
         bedroom_number = dictionary[Keys.BedroomNumber] as? NSNumber
         car_spaces = dictionary[Keys.CarSpaces] as? NSNumber
         commission = dictionary[Keys.Commission] as? String

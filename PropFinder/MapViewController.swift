@@ -18,15 +18,13 @@ class PropAnnotation : MKPointAnnotation {
     
 }
 
-protocol MapViewControllerDelegate {
-    func initSearchWithParam(location: String!, bedroom: String?, price: String?, pref: String?)
-}
-
 class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
     
     @IBOutlet var mapView: MKMapView!
     var searchResult = [Property]() //To display only the current search results
-    //var searchResultPins = [MKAnnotation]()
+
+    @IBOutlet var activityIndicator: UIActivityIndicatorView!
+    
     var temporaryContext: NSManagedObjectContext!
     
     var guidList : [String] = []
@@ -40,6 +38,10 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         
         mapView.delegate = self
         
+        activityIndicator.hidden = true
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Clear", style: .Plain, target: self, action: "clearButton")
+        
         // set the fetchedResultsControllerDelegate to self
         fetchedResultsController.delegate = self
         
@@ -50,33 +52,36 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         //config map when first loaded
         if (firstLoad == true) {
             fetchPersistentProperties(true)
-
             firstLoad = false
         }
-        
     }
     
     override func viewWillAppear(animated: Bool) {
         if (firstLoad == false) {
             guidList = []
             
+            
             //delete all annotations
             let allAnnotations = mapView.annotations
             mapView.removeAnnotations(allAnnotations)
             
             fetchPersistentProperties(false)
-            
-            displayTempProperties() {(done) in }
+            if (searchResult.count > 0) {
+                displayTempProperties() {(done) in }
+            }
             
         }
         
     }
     
-    func initSearchWithParam(location: String!, bedroom: String?, price: String?, pref: String?) {
+    func initSearchWithParam(location: String!, longitude: String?, latitude: String?, bedroom: String?, price: String?, pref: String?) {
+        
+        activityIndicator.hidden = false
+        activityIndicator.startAnimating()
         
         clearTempObjects { (done) -> Void in
         
-            let parameters = NestoriaClient.sharedInstance().methodArgumentsWithExtendedParams(location, bedroom: bedroom, price: price, pref: pref)
+            let parameters = NestoriaClient.sharedInstance().methodArgumentsWithExtendedParams(location, latitude: latitude, longitude: longitude, bedroom: bedroom, price: price, pref: pref)
         
             NestoriaClient.sharedInstance().taskForSearchListing(parameters) { (result, error) in
             
@@ -89,32 +94,25 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
                     if let propDictionaries = parsedResult["response"]!["listings"] as? [[String: AnyObject]] {
                     
                         dispatch_async(dispatch_get_main_queue(), {
-                        //self.temporaryContext.performBlockAndWait {
                         
                             self.searchResult = propDictionaries.map() {
                             Property(dictionary: $0, context: self.temporaryContext)
                             }
-                        //}
-                            print("1 - searchresults: \(self.searchResult.count)")
-                        //dispatch_async(dispatch_get_main_queue(), {
-                        
+                            
+                            if (self.searchResult.count == 0) {
+                                self.displayAlert("No results found", message: "Please try another search.")
+                            }
+        
                             self.displayTempProperties() { (done) in
                                 
                                 dispatch_async(dispatch_get_main_queue(), {
-//                                    //find temp pins
-//                                    let allAnnotations = self.mapView.annotations as! [PropAnnotation]
-//                                    var tempPins : [MKAnnotation] = []
-//                                    for annotation in allAnnotations {
-//                                        if (annotation.saved == false) {
-//                                            tempPins.append(annotation)
-//                                        }
-//                                    }
-//                                    print("3 - temp pins: \(tempPins.count)")
-//                                    //zoom map to new pins
                                     self.setMapViewSpan(self.searchResult)
-                                    })
+                                    self.activityIndicator.stopAnimating()
+                                    self.activityIndicator.hidden = true
+                                })
                             }
                         })
+                        
                     } else {
                         self.displayAlert("Nestoria Error", message: "Cannot parse JSON.")
                     }
@@ -123,9 +121,13 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         }
     }
     
-    
+    func clearButton() {
+        
+        clearTempObjects() { (done) in }
+    }
     func clearTempObjects(completionHandler: (done: Bool)->Void) {
         
+        searchResult = []
         //clear temp context
         let fetchPin = NSFetchRequest(entityName: "Property")
         fetchPin.sortDescriptors = [NSSortDescriptor(key: "guid", ascending: true)]
@@ -159,8 +161,10 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
                 }
             }
         }
+        print("annotations to delete: \(annotationsToDelete.count)")
         mapView.removeAnnotations(annotationsToDelete)
         
+        print("clearTempObjects completion handler invoked")
         completionHandler(done: true)
         
     }
@@ -226,25 +230,38 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
             let annotation = view.annotation as? PropAnnotation
             
             let guid = annotation?.guid
+            var fetchedObjects : [Property]?
             
-            //fetch pin entity from temp core data
             let fetchPin = NSFetchRequest(entityName: "Property")
             fetchPin.sortDescriptors = [NSSortDescriptor(key: "guid", ascending: true)]
             let pred = NSPredicate(format: "guid == %@", guid!)
             fetchPin.predicate = pred
             
-            let fetchedPinResultsController = NSFetchedResultsController(fetchRequest: fetchPin,
-                managedObjectContext: self.temporaryContext,
-                sectionNameKeyPath: nil,
-                cacheName: nil)
+            var fetchedPropertyResultsController : NSFetchedResultsController?
             
-            // Fetch
+            if (annotation?.saved == false) {
+                
+                fetchedPropertyResultsController = NSFetchedResultsController(fetchRequest: fetchPin,
+                    managedObjectContext: self.temporaryContext,
+                    sectionNameKeyPath: nil,
+                    cacheName: nil)
+            } else {
+                
+                fetchedPropertyResultsController = NSFetchedResultsController(fetchRequest: fetchPin,
+                    managedObjectContext: self.sharedContext,
+                    sectionNameKeyPath: nil,
+                    cacheName: nil)
+                
+            }
+            
             do {
-                try fetchedPinResultsController.performFetch()
+                try fetchedPropertyResultsController!.performFetch()
             } catch {}
             
-            if (fetchedPinResultsController.fetchedObjects!.count > 0) {
-                let prop = fetchedPinResultsController.fetchedObjects![0] as? Property
+            fetchedObjects = fetchedPropertyResultsController!.fetchedObjects as? [Property]
+            
+            if (fetchedObjects!.count > 0) {
+                let prop = fetchedObjects![0]
                 
                 let controller = self.storyboard?.instantiateViewControllerWithIdentifier("PropDetailVC") as! PropDetailViewController
                 
@@ -286,9 +303,6 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
                     NestoriaClient.sharedInstance().taskForDownloadImage(currentProp.img_url!) { (image, error) in
                         
                         if (error != nil) {
-                            
-                            print("error downloading image")
-                            currentProp.nestoriaImage = UIImage(named: "placeholderHouse")
                             newAnotation.propertyImage = UIImage(named: "placeholderHouse")
                             
                         } else {
@@ -300,18 +314,15 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
                         
                         dispatch_async(dispatch_get_main_queue(), {
                             self.mapView.addAnnotation(newAnotation)
-                            print("added annotation number \(count)")
                             if (count == totalProps) {
-                                print("displayNewPins completed")
+                                print("displayNewPins completion handler invoked")
                                 completionHandler(done: true)
                             }
-                            
-                        })
-                    }
-                }
-                
-            }
-        }
+                        }) //end dispatch
+                    } //end nestoria client
+                } //end else
+            } //end property loop
+        } //end if let props
         
     }
 
@@ -365,21 +376,21 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
                     propsToDisplay?.append(prop)
                 }
             }
-            print("2 - Number of props to display: \(propsToDisplay!.count)")
             displayNewPins(propsToDisplay, saved: false) { (done) in
-                print("displayTempProperties completed")
+                print("displayTempProperties completion handler invoked")
                 completionHandler(done: true)
             }
+        } else {
+            completionHandler(done: true)
         }
     }
     
     func setMapViewSpan(props: [Property]) {
         
-        print("setmapspan")
-            var maxLat = -90.0
-            var minLat = 90.0
-            var maxLon = -180.0
-            var minLon = 180.0
+        var maxLat = -90.0
+        var minLat = 90.0
+        var maxLon = -180.0
+        var minLon = 180.0
         
         if (props.count > 0) {
             maxLat = props[0].coordinate!.latitude

@@ -25,21 +25,15 @@ class FavTableVewCell : UITableViewCell {
     
     @IBOutlet var innerView: UIView!
     
-    
-    
 }
 
 class FavouriteViewController: UIViewController, UITableViewDelegate, NSFetchedResultsControllerDelegate {
     
     @IBOutlet var tableView: UITableView!
     
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         fetchedResultsController.delegate = self
-       
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -50,14 +44,6 @@ class FavouriteViewController: UIViewController, UITableViewDelegate, NSFetchedR
         
         tableView.reloadData()
     }
-    
-    //UITableVew methods
-    
-//    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-//        return 1
-//    }
-    
-    
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let sectionInfo = self.fetchedResultsController.sections![section]
@@ -174,9 +160,6 @@ class FavouriteViewController: UIViewController, UITableViewDelegate, NSFetchedR
                 tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
                 
             case .Update:
-                //let cell = tableView.cellForRowAtIndexPath(indexPath!) as! FavTableVewCell
-                //let actor = controller.objectAtIndexPath(indexPath!) as! Property
-                //self.configureCell(cell, withActor: actor)
                 break
                 
             case .Move:

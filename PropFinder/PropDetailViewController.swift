@@ -13,7 +13,6 @@ import CoreData
 
 class PropDetailViewController: UIViewController {
     
-    
     @IBOutlet var summaryLabel: UITextView!
     @IBOutlet var detailMapView: MKMapView!
     @IBOutlet var priceLabel: UILabel!
@@ -101,7 +100,6 @@ class PropDetailViewController: UIViewController {
         
         //persist in core data
         let image = thisProperty?.nestoriaImage
-        //let dict = thisProperty?.dictionary
         
         let dict : [String: AnyObject?] = [
             NestoriaClient.Keys.AuctionDate : thisProperty?.auction_date,
@@ -137,13 +135,6 @@ class PropDetailViewController: UIViewController {
             prop.nestoriaImage = image
         }
         CoreDataStackManager.sharedInstance().saveContext()
-    }
-
-    
-    @IBAction func didPushMorgageButton(sender: AnyObject) {
-        
-        
-        
     }
     
     func setSaved() {

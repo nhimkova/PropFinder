@@ -16,12 +16,62 @@
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo" translatesAutoresizingMaskIntoConstraints="NO" id="xon-eN-hBX">
+                                <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
+                                <variation key="widthClass=compact" misplaced="YES">
+                                    <rect key="frame" x="184" y="284" width="33" height="32"/>
+                                </variation>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="PropCorn" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jGb-ou-j1x">
+                                <rect key="frame" x="-42" y="-21" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="26"/>
+                                <color key="textColor" red="0.1282218426215051" green="0.72395597662141775" blue="0.5730838395874428" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                                <variation key="widthClass=compact" misplaced="YES">
+                                    <rect key="frame" x="129" y="326" width="142" height="23"/>
+                                </variation>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" red="0.0" green="0.24238554400000001" blue="0.50251677849999998" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstItem="jGb-ou-j1x" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="1Wb-E8-IOG"/>
+                            <constraint firstItem="xon-eN-hBX" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="Rjw-ea-jx3"/>
+                            <constraint firstItem="jGb-ou-j1x" firstAttribute="top" secondItem="xon-eN-hBX" secondAttribute="bottom" constant="10" id="WGw-84-rOt"/>
+                            <constraint firstItem="xon-eN-hBX" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="sXj-sD-8Ua"/>
+                        </constraints>
+                        <variation key="default">
+                            <mask key="subviews">
+                                <exclude reference="xon-eN-hBX"/>
+                                <exclude reference="jGb-ou-j1x"/>
+                            </mask>
+                            <mask key="constraints">
+                                <exclude reference="Rjw-ea-jx3"/>
+                                <exclude reference="sXj-sD-8Ua"/>
+                                <exclude reference="1Wb-E8-IOG"/>
+                                <exclude reference="WGw-84-rOt"/>
+                            </mask>
+                        </variation>
+                        <variation key="widthClass=compact">
+                            <mask key="subviews">
+                                <include reference="xon-eN-hBX"/>
+                                <include reference="jGb-ou-j1x"/>
+                            </mask>
+                            <mask key="constraints">
+                                <include reference="Rjw-ea-jx3"/>
+                                <include reference="sXj-sD-8Ua"/>
+                                <include reference="1Wb-E8-IOG"/>
+                                <include reference="WGw-84-rOt"/>
+                            </mask>
+                        </variation>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="53" y="375"/>
+            <point key="canvasLocation" x="52.5" y="375"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="logo" width="33" height="33"/>
+    </resources>
 </document>
