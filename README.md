@@ -28,4 +28,4 @@ This screen shows the saved properties. When clicking on an item the PropDetailV
 
 #### PropDetailViewController
 This screen shows the property details. When the property is not yet saved, we can save it by clicking on the heart on the right bottom corner of the image (it will turn red).
-When the property is already favourited and we want to delete it, click on the heart again (it will turn gray). 
+When the property is already favourited and we want to delete it, click on the heart again (it will turn grey). 
