@@ -6,10 +6,12 @@ This is a property finder app for UK properties where you can search for specifi
 The app starts up with 3 tab views: MapViewController, SearchViewController and FavouriteViewController.
 
 #### Screens
-![MapViewController screen shot](https://github.com/nhimkova/PropFinder/blob/master/ReadMe/mapviewcontroller.png)
-![SearchViewController screen shot](https://github.com/nhimkova/PropFinder/blob/master/ReadMe/searchviewcontroller.png)
-![FavoriteViewController screen shot](https://github.com/nhimkova/PropFinder/blob/master/ReadMe/favouriteviewcontroller.png)
-![PropDetailViewController screen shot](https://github.com/nhimkova/PropFinder/blob/master/ReadMe/propdetailviewcontroller.png)
+
+<img src="https://github.com/nhimkova/PropFinder/blob/master/ReadMe/mapviewcontroller.png" width="300" height="500" />
+<img src="https://github.com/nhimkova/PropFinder/blob/master/ReadMe/searchviewcontroller.png" width="300" height="500" />
+<img src="https://github.com/nhimkova/PropFinder/blob/master/ReadMe/favouriteviewcontroller.png" width="300" height="500" />
+<img src="https://github.com/nhimkova/PropFinder/blob/master/ReadMe/propdetailviewcontroller.png" width="300" height="500" />
+<img src="https://github.com/nhimkova/PropFinder/blob/master/ReadMe/launchscreen.PNG" width="300" height="500" />
 
 #### MapViewController
 This view controller displays the search results and saved properties. Search results are the orange color houses and saved properties are green color houses.
