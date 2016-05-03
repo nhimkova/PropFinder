@@ -97,7 +97,7 @@ class NestoriaClient : NSObject {
         
     }
     
-    func methodArgumentsWithExtendedParams(placeName : String?, latitude: String?, longitude: String?,bedroom: String?, price: String?, pref: String?) -> [String : AnyObject]{
+    func methodArgumentsWithExtendedParams(placeName : String?, latitude: String?, longitude: String?, distance: String?, bedroom: String?, price: String?, pref: String?) -> [String : AnyObject]{
         
         var methodArguments : [String : AnyObject] = [
             JSONKeys.Method : Constants.SEARCH_LISTINGS,
@@ -113,7 +113,11 @@ class NestoriaClient : NSObject {
         
         if let _ = latitude {
             if let _ = longitude {
-                let centre_point = latitude! + "," + longitude!
+                var centre_point = latitude! + "," + longitude!
+                if let _ = distance {
+                    centre_point += ","
+                    centre_point += distance!
+                }
                 methodArguments[JSONKeys.CentrePoint] = centre_point
             }
         }

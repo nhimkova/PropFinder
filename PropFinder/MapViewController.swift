@@ -74,14 +74,14 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         
     }
     
-    func initSearchWithParam(location: String!, longitude: String?, latitude: String?, bedroom: String?, price: String?, pref: String?) {
+    func initSearchWithParam(location: String!, longitude: String?, latitude: String?, distance: String?, bedroom: String?, price: String?, pref: String?) {
         
         activityIndicator.hidden = false
         activityIndicator.startAnimating()
         
         clearTempObjects { (done) -> Void in
         
-            let parameters = NestoriaClient.sharedInstance().methodArgumentsWithExtendedParams(location, latitude: latitude, longitude: longitude, bedroom: bedroom, price: price, pref: pref)
+            let parameters = NestoriaClient.sharedInstance().methodArgumentsWithExtendedParams(location, latitude: latitude, longitude: longitude, distance: distance, bedroom: bedroom, price: price, pref: pref)
         
             NestoriaClient.sharedInstance().taskForSearchListing(parameters) { (result, error) in
             
@@ -125,6 +125,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         
         clearTempObjects() { (done) in }
     }
+    
     func clearTempObjects(completionHandler: (done: Bool)->Void) {
         
         searchResult = []
@@ -197,23 +198,22 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
             }
             
             let image = userAnnotation.propertyImage
-            let button   = UIButton(type: .Custom)
-            button.frame = CGRectMake(50, 50, 150, 150)
-            button.setImage(image, forState: .Normal)
+            let imageView   = UIImageView(frame: CGRectMake(0, 0, 120, 120))
+            imageView.image = image
             
-            let widthConstraint = NSLayoutConstraint(item: button, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 150)
-            let heightConstraint = NSLayoutConstraint(item: button, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 150)
+            let widthConstraint = NSLayoutConstraint(item: imageView, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 120)
+            let heightConstraint = NSLayoutConstraint(item: imageView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 120)
             
-            button.contentMode = .ScaleAspectFill
+            imageView.contentMode = .ScaleToFill
             
-            //button.addTarget(self, action: "showDetail:", forControlEvents:UIControlEvents.TouchUpInside)
+            imageView.addConstraint(widthConstraint)
+            imageView.addConstraint(heightConstraint)
             
-            button.addConstraint(widthConstraint)
-            button.addConstraint(heightConstraint)
+            pinView!.detailCalloutAccessoryView = imageView
             
-            pinView!.detailCalloutAccessoryView = button
-            
+            let button = UIButton(type: .DetailDisclosure)
             pinView!.rightCalloutAccessoryView = UIButton(type: .DetailDisclosure)
+            pinView!.rightCalloutAccessoryView = button
             
             
         }
@@ -408,10 +408,10 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
             }
         } else {
             // London
-            maxLat = 51.5074 + 0.1
-            minLat = 51.5074 - 0.1
-            maxLon = 0.1278 + 0.1
-            minLon = 0.1278 - 0.1
+            maxLat = 51.506712 + 0.01
+            minLat = 51.506712 - 0.01
+            maxLon = -0.164967 + 0.01
+            minLon = -0.164967 - 0.01
             
         }
         

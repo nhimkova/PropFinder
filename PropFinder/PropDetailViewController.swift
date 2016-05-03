@@ -11,7 +11,7 @@ import UIKit
 import MapKit
 import CoreData
 
-class PropDetailViewController: UIViewController {
+class PropDetailViewController: UIViewController, MKMapViewDelegate {
     
     @IBOutlet var summaryLabel: UITextView!
     @IBOutlet var detailMapView: MKMapView!
@@ -30,6 +30,7 @@ class PropDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        detailMapView.delegate = self
         
         configMap()
         
@@ -169,6 +170,29 @@ class PropDetailViewController: UIViewController {
         return fetchedResultsController
         
     }()
+    
+    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
+        
+        var reuseId = "propertyPin"
+        
+        var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId)
+        
+        if pinView == nil {
+            pinView = MKAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+            pinView!.canShowCallout = true
+            if #available(iOS 9.0, *) {
+                pinView!.image = UIImage(named:"pin")!
 
+            } else {
+                // Fallback on earlier versions
+            }
+            
+        }
+        else {
+            pinView!.annotation = annotation
+        }
+        
+        return pinView
+    }
     
 }

@@ -16,6 +16,7 @@ class SearchViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet var bedroomControl: UISegmentedControl!
     @IBOutlet var priceControl: UISegmentedControl!
     @IBOutlet var resultControl: UISegmentedControl!
+    @IBOutlet var distanceControl: UISegmentedControl!
     
     
     override func viewDidLoad() {
@@ -64,13 +65,14 @@ class SearchViewController: UIViewController, UITextFieldDelegate {
     @IBAction func didPushSearch(sender: AnyObject) {
         
         var location : String?
+        var distance: String?
         var bedroom : String?
         var price : String?
         var pref : String?
         var lon : String?
         var lat : String?
         
-        (location, bedroom, price, pref) = getParams()
+        (location, distance, bedroom, price, pref) = getParams()
         
         if (location == "") {
             displayAlert("Error", message: "Please enter location or use current map location.")
@@ -88,12 +90,12 @@ class SearchViewController: UIViewController, UITextFieldDelegate {
                 location = nil
             }
             
-            mapVC?.initSearchWithParam(location, longitude: lon, latitude: lat, bedroom: bedroom, price: price, pref: pref)
+            mapVC?.initSearchWithParam(location, longitude: lon, latitude: lat, distance: distance, bedroom: bedroom, price: price, pref: pref)
             tabBarController?.selectedIndex = 0
         }
     }
     
-    func getParams()->(location: String?, bedroom: String?, price: String?, pref: String?) {
+    func getParams()->(location: String?, distance: String?, bedroom: String?, price: String?, pref: String?) {
         
         let location = locationTextField?.text
         let bedroomIndex = bedroomControl.selectedSegmentIndex
@@ -147,14 +149,28 @@ class SearchViewController: UIViewController, UITextFieldDelegate {
             pref = "relevancy"
         }
         
-        return (location, bedroom, price, pref)
+        let distanceIndex = distanceControl.selectedSegmentIndex
+        var distance : String?
+        if (distanceIndex == 0) {
+            distance = "1km"
+        }
+        else if (distanceIndex == 1) {
+            distance = "2km"
+        }
+        else if (distanceIndex == 2) {
+            distance = "5km"
+        }
+        else if (distanceIndex == 3) {
+            distance = "10km"
+        }
+        
+        return (location, distance, bedroom, price, pref)
         
     }
     
     @IBAction func didPushCurrentLocation(sender: AnyObject) {
         locationTextField.text = "Current Map Location"
     }
-    
     
     func displayAlert(title: String!, message: String!) {
         let alertController = UIAlertController(title: title, message:
